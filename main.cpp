@@ -4,9 +4,31 @@
 #include <osg/AnimationPath>
 #include <osg/ShapeDrawable>
 #include "osg/Material"
+#include "osg/PositionAttitudeTransform"
 
 int main() {
     osg::ref_ptr<osg::Group> root = new osg::Group;
+
+    osg::ref_ptr<osg::PositionAttitudeTransform> lightPAT(new osg::PositionAttitudeTransform());
+
+    lightPAT->setPosition(osg::Vec3(3.0, 0.0, 3.0));
+    root->addChild(lightPAT);
+
+    // Crear un cubo
+    osg::ref_ptr<osg::Box> lightBox = new osg::Box(osg::Vec3(0, 0, 0), 0.2f);
+    osg::ref_ptr<osg::ShapeDrawable> lightDrawable = new osg::ShapeDrawable(lightBox);
+
+    // Setup GL_LIGHT1. Leave GL_LIGHT0 as it is by default (enabled)
+    osg::ref_ptr<osg::LightSource> lightSource(new osg::LightSource());
+    lightSource->addChild(lightDrawable);
+    lightSource->getLight()->setLightNum(1);
+    lightSource->getLight()->setPosition(osg::Vec4(0.0, 0.0, 0.0, 1.0));
+    lightSource->getLight()->setDiffuse(osg::Vec4(1.0, 1.0, 0.0, 1.0));
+
+    lightPAT->addChild(lightSource);
+
+    osg::ref_ptr<osg::StateSet> rootState = root->getOrCreateStateSet();
+    rootState->setMode(GL_LIGHT1, osg::StateAttribute::ON);
 
     // Crear un cubo
     osg::ref_ptr<osg::Box> box = new osg::Box(osg::Vec3(0, 0, 0), 1.0f);
