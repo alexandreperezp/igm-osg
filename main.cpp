@@ -5,6 +5,9 @@
 #include <osg/ShapeDrawable>
 #include "osg/Material"
 #include "osg/PositionAttitudeTransform"
+#include "osgDB/ReadFile"
+#include "osg/Texture2D"
+#include "osg/TexGen"
 
 int main() {
     osg::ref_ptr<osg::Group> root = new osg::Group;
@@ -91,8 +94,19 @@ int main() {
     transform->setUpdateCallback(apcb);
     transform2->setUpdateCallback(apcb2);
 
-    root->addChild(transform);
-    root->addChild(transform2);
+    osg::ref_ptr<osg::Group> boxes = new osg::Group;
+
+    boxes->addChild(transform);
+    boxes->addChild(transform2);
+
+    osg::ref_ptr<osg::StateSet> ss = boxes->getOrCreateStateSet();
+
+    osg::ref_ptr<osg::Image> image = osgDB::readImageFile("copilot.png");
+    osg::ref_ptr<osg::Texture2D> tex(new osg::Texture2D());
+    tex->setImage(image);
+    ss->setTextureAttributeAndModes(0, tex);
+
+    root->addChild(boxes);
 
     // Crear un visor y ejecutar
     osgViewer::Viewer viewer;
